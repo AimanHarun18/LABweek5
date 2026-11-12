@@ -1,0 +1,104 @@
+Script started on 2026-11-12 09:43:45+00:00 [COMMAND="python3 topo.py --id 2206" TERM="xterm-256color" TTY="/dev/pts/0" COLUMNS="67" LINES="10"]
+*** Compiling tunnel.p4
+*** Configuring hosts
+h1 h2 h3 
+*** Starting controller
+
+*** Starting 2 switches
+s1 s2 
+*** s1: 6 table entries added
+*** s2: 6 table entries added
+*** Your hosts: h1 10.6.0.1, h2 10.6.0.2, h3 10.6.0.3
+*** Ready. Switch logs: logs/s1.txt, logs/s2.txt. What h2 and h3 receive: logs/h2.txt, logs/h3.txt
+*** Starting CLI:
+mininet> h1 python3 send.py 10.6.0.2 "to h2" --tunnel 2
+###[ Ethernet ]### 
+  dst       = ff:ff:ff:ff:ff:ff
+  src       = 00:00:00:00:00:01
+  type      = 0x1212
+###[ MyTunnel ]### 
+     proto_id  = 2048
+     dst_id    = 2
+     hop_limit = 8
+     reserved  = 0
+###[ IP ]### 
+        version   = 4
+        ihl       = 5
+        tos       = 0x0
+        len       = 33
+        id        = 1
+        flags     = 
+        frag      = 0
+        ttl       = 64
+        proto     = udp
+        chksum    = 0x66bd
+        src       = 10.6.0.1
+        dst       = 10.6.0.2
+        \options   \
+###[ UDP ]### 
+           sport     = 4321
+           dport     = 4321
+           len       = 13
+           chksum    = 0x32c
+###[ Raw ]### 
+              load      = 'to h2'
+
+Sent from h1-eth0.
+mininet> h1 python3 send.py 10.6.0.3 "to h3" --tunnel 3
+###[ Ethernet ]### 
+  dst       = ff:ff:ff:ff:ff:ff
+  src       = 00:00:00:00:00:01
+  type      = 0x1212
+###[ MyTunnel ]### 
+     proto_id  = 2048
+     dst_id    = 3
+     hop_limit = 8
+     reserved  = 0
+###[ IP ]### 
+        version   = 4
+        ihl       = 5
+        tos       = 0x0
+        len       = 33
+        id        = 1
+        flags     = 
+        frag      = 0
+        ttl       = 64
+        proto     = udp
+        chksum    = 0x66bc
+        src       = 10.6.0.1
+        dst       = 10.6.0.3
+        \options   \
+###[ UDP ]### 
+           sport     = 4321
+           dport     = 4321
+           len       = 13
+           chksum    = 0x22b
+###[ Raw ]### 
+              load      = 'to h3'
+
+Sent from h1-eth0.
+mininet> sh cat logs/h2.txt logs/h3.txt
+Listening on h2-eth0...
+Received (tunnelled, dst_id=2, hop_limit=6) from 10.6.0.1 to 10.6.0.2, TTL 64: 'to h2'
+Listening on h3-eth0...
+Received (tunnelled, dst_id=3, hop_limit=6) from 10.6.0.1 to 10.6.0.3, TTL 64: 'to h3'
+mininet> h1 ping -c 2 h3
+PING 10.6.0.3 (10.6.0.3) 56(84) bytes of data.
+64 bytes from 10.6.0.3: icmp_seq=1 ttl=62 time=8.80 ms
+64 bytes from 10.6.0.3: icmp_seq=2 ttl=62 time=10.2 ms
+
+--- 10.6.0.3 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1001ms
+rtt min/avg/max/mdev = 8.800/9.523/10.247/0.723 ms
+mininet> exit
+*** Stopping 0 controllers
+
+*** Stopping 4 links
+....
+*** Stopping 2 switches
+s1 s2 
+*** Stopping 3 hosts
+h1 h2 h3 
+*** Done
+
+Script done on 2026-11-12 09:44:53+00:00 [COMMAND_EXIT_CODE="0"]
